@@ -1,0 +1,19 @@
+Load packages
+'''
+using Distributed
+addprocs(7)
+@everywhere using MKtest
+using CSV, DataFrames, JLD2
+'''
+Parse sfs/div file
+'''
+@everywhere using MKtest, CSV, DataFrames, JLD2
+alpha, sfs, divergence = MKtest.parse_sfs(sample_size = 661, data = "analysis_largec/0314_tpg_largec_ortho.tsv",gene_list="./mammals_manual_VIPs.txt")
+'''
+Calculate summary statistics
+bootstrap equals to the number of gene list (rows) in gene_list file.
+'''
+adap = MKtest.parameters(n=661,dac=[1,2,4,5,10,20,50,100,200,400,500,661,925,1000])
+
+@time summstat = MKtest.summary_statistics(param=adap,sfs=sfs,divergence=divergence,h5_file="./rates.jld2",analysis_folder="./analysis_largec/vips/",summstat_size=10^5,bootstrap=1);
+'''
